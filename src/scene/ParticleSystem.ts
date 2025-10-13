@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 export class ParticleSystem {
   private particles: THREE.InstancedMesh;
@@ -7,6 +7,9 @@ export class ParticleSystem {
   private phases: Float32Array;
   private dummy = new THREE.Object3D();
   private basePositions: THREE.Vector3[] = [];
+  private tempVec1 = new THREE.Vector3();
+  private tempVec2 = new THREE.Vector3();
+
   private dispersing = false;
   private disperseTime = 0;
 
@@ -71,7 +74,7 @@ export class ParticleSystem {
       this.dummy.matrix.decompose(
         this.dummy.position,
         this.dummy.quaternion,
-        this.dummy.scale
+        this.dummy.scale,
       );
 
       const basePos = this.basePositions[i];
@@ -88,18 +91,18 @@ export class ParticleSystem {
         basePos.z + Math.sin(time * orbitSpeed * 0.5 + phase) * orbitRadius;
 
       if (mouseInfluence.length() > 0.01) {
-        const toMouse = new THREE.Vector3().subVectors(
+        this.tempVec1.subVectors(
           this.dummy.position,
-          mouseInfluence
+          mouseInfluence,
         );
-        const dist = toMouse.length();
+        const dist = this.tempVec1.length();
 
         if (dist < 1.5) {
           const force = (1.5 - dist) / 1.5;
-          toMouse.normalize().multiplyScalar(force * 0.3);
-          targetX += toMouse.x;
-          targetY += toMouse.y;
-          targetZ += toMouse.z;
+          this.tempVec1.normalize().multiplyScalar(force * 0.3);
+          targetX += this.tempVec1.x;
+          targetY += this.tempVec1.y;
+          targetZ += this.tempVec1.z;
         }
       }
 
@@ -111,13 +114,13 @@ export class ParticleSystem {
         targetY += this.velocities[i * 3 + 1] * 15.0 * disperseForce;
         targetZ += this.velocities[i * 3 + 2] * 15.0 * disperseForce;
 
-        const backToBase = new THREE.Vector3().subVectors(
+        this.tempVec2.subVectors(
           basePos,
-          this.dummy.position
+          this.dummy.position,
         );
-        targetX += backToBase.x * returnForce * 0.1;
-        targetY += backToBase.y * returnForce * 0.1;
-        targetZ += backToBase.z * returnForce * 0.1;
+        targetX += this.tempVec2.x * returnForce * 0.1;
+        targetY += this.tempVec2.y * returnForce * 0.1;
+        targetZ += this.tempVec2.z * returnForce * 0.1;
       }
 
       this.dummy.position.x += (targetX - this.dummy.position.x) * 0.05;
