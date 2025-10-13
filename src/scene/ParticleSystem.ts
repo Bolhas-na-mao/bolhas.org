@@ -150,7 +150,7 @@ export class ParticleSystem {
   }
 
   dispose(): void {
-   this.particles.geometry.dispose();
-   (this.particles.material as THREE.Material).dispose();
- }
+    this.particles.geometry.dispose();
+    (this.particles.material as THREE.Material).dispose();
+  }
 }

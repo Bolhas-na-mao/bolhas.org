@@ -1,11 +1,10 @@
 :root {
-  --color-foreground: #F9F8F6;
+  --color-foreground: #f9f8f6;
   --color-pink: #332c34ff;
   --color-blue: #c4efff;
   --color-bg: #faf8f5;
   --color-text: #2a2a2a;
   --color-text-light: #6a6a6a;
-
 }
 
 * {
@@ -15,7 +14,7 @@
 }
 
 body {
-  font-family: "DM Mono", monospace;
+  font-family: 'DM Mono', monospace;
   font-weight: 300;
   font-style: normal;
   background-color: var(--color-bg);
@@ -169,17 +168,24 @@ main * {
 }
 
 @keyframes chromatic {
-  0%, 100% {
+  0%,
+  100% {
     text-shadow: 0 0 0 transparent;
   }
   25% {
-    text-shadow: -2px 0 0 rgba(255, 0, 0, 0.5), 2px 0 0 rgba(0, 255, 255, 0.5);
+    text-shadow:
+      -2px 0 0 rgba(255, 0, 0, 0.5),
+      2px 0 0 rgba(0, 255, 255, 0.5);
   }
   50% {
-    text-shadow: -3px 0 0 rgba(255, 0, 0, 0.7), 3px 0 0 rgba(0, 255, 255, 0.7);
+    text-shadow:
+      -3px 0 0 rgba(255, 0, 0, 0.7),
+      3px 0 0 rgba(0, 255, 255, 0.7);
   }
   75% {
-    text-shadow: -2px 0 0 rgba(255, 0, 0, 0.5), 2px 0 0 rgba(0, 255, 255, 0.5);
+    text-shadow:
+      -2px 0 0 rgba(255, 0, 0, 0.5),
+      2px 0 0 rgba(0, 255, 255, 0.5);
   }
 }
 
@@ -254,10 +260,12 @@ footer {
     rgba(196, 239, 255, 0.8),
     rgba(241, 167, 254, 0.6)
   );
-  animation: fallbackFloat 4s ease-in-out infinite,
+  animation:
+    fallbackFloat 4s ease-in-out infinite,
     fallbackPulse 2s ease-in-out infinite;
   filter: blur(2px);
-  box-shadow: 0 0 60px rgba(241, 167, 254, 0.4),
+  box-shadow:
+    0 0 60px rgba(241, 167, 254, 0.4),
     inset 0 0 60px rgba(255, 255, 255, 0.3);
 }
 
