@@ -152,8 +152,16 @@ export class ParticleSystem {
     }
   }
 
-  dispose(): void {
+   dispose(): void {
+    this.dispersing = false;
+    
+    if (this.particles.parent) {
+      this.particles.parent.remove(this.particles);
+    }
+    
     this.particles.geometry.dispose();
     (this.particles.material as THREE.Material).dispose();
+    
+    this.basePositions.length = 0;
   }
-}
+ }
