@@ -8,25 +8,16 @@ importers:
 
   .:
     dependencies:
+      three:
+        specifier: ^0.180.0
+        version: 0.180.0
+    devDependencies:
       '@rollup/pluginutils':
         specifier: ^5.3.0
         version: 5.3.0(rollup@4.52.4)
       '@types/three':
         specifier: ^0.180.0
         version: 0.180.0
-      three:
-        specifier: ^0.180.0
-        version: 0.180.0
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      vite:
-        specifier: ^7.1.9
-        version: 7.1.9
-      vite-plugin-glsl:
-        specifier: ^1.5.4
-        version: 1.5.4(@rollup/pluginutils@5.3.0(rollup@4.52.4))(esbuild@0.25.10)(vite@7.1.9)
-    devDependencies:
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.46.1
         version: 8.46.1(@typescript-eslint/parser@8.46.1(eslint@9.37.0)(typescript@5.9.3))(eslint@9.37.0)(typescript@5.9.3)
@@ -45,6 +36,15 @@ importers:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.1.9
+        version: 7.1.9
+      vite-plugin-glsl:
+        specifier: ^1.5.4
+        version: 1.5.4(@rollup/pluginutils@5.3.0(rollup@4.52.4))(esbuild@0.25.10)(vite@7.1.9)
 
 packages:
 
