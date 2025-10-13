@@ -148,4 +148,9 @@ export class ParticleSystem {
       this.velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
     }
   }
+
+  dispose(): void {
+   this.particles.geometry.dispose();
+   (this.particles.material as THREE.Material).dispose();
+ }
 }
