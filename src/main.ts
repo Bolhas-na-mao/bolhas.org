@@ -72,14 +72,28 @@ class App {
         projectCard.className = 'project-card';
         projectCard.style.setProperty('--delay', `${index * 0.1}s`);
 
-      projectCard.innerHTML = `
-        <img src="${project.thumbnail}" alt="${project.title}" class="project-thumbnail" />
-        <div class="project-content">
-          <h3>${project.title}</h3>
-          <p>${project.description}</p>
-          <a href="${project.slug}.bolhas.org" class="project-link">explorar →</a>
-        </div>
-      `;
+      const img = document.createElement('img');
+      img.className = 'project-thumbnail';
+      img.src = project.thumbnail;
+      img.alt = project.title;
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'project-content';
+
+      const h3 = document.createElement('h3');
+      h3.textContent = project.title;
+
+      const p = document.createElement('p');
+      p.textContent = project.description;
+
+      const a = document.createElement('a');
+      a.className = 'project-link';
+      a.href = `https://${encodeURIComponent(project.slug)}.bolhas.org`;
+      a.textContent = 'explorar →';
+
+      contentDiv.append(h3, p, a);
+      projectCard.append(img, contentDiv);
+
 
         projectsList.appendChild(projectCard);
       });
