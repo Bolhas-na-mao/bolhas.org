@@ -72,11 +72,14 @@ class App {
         projectCard.className = 'project-card';
         projectCard.style.setProperty('--delay', `${index * 0.1}s`);
 
-        projectCard.innerHTML = `
+      projectCard.innerHTML = `
+        <img src="${project.thumbnail}" alt="${project.title}" class="project-thumbnail" />
+        <div class="project-content">
           <h3>${project.title}</h3>
           <p>${project.description}</p>
-          <a href="#${project.slug}" class="project-link">explorar →</a>
-        `;
+          <a href="${project.slug}.bolhas.org" class="project-link">explorar →</a>
+        </div>
+      `;
 
         projectsList.appendChild(projectCard);
       });
