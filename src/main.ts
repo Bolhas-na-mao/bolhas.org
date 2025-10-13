@@ -71,29 +71,39 @@ class App {
         const projectCard = document.createElement('div');
         projectCard.className = 'project-card';
         projectCard.style.setProperty('--delay', `${index * 0.1}s`);
+        projectCard.style.cursor = 'pointer';
 
-      const img = document.createElement('img');
-      img.className = 'project-thumbnail';
-      img.src = project.thumbnail;
-      img.alt = project.title;
+        const projectUrl = `https://${encodeURIComponent(project.slug)}.bolhas.org`;
 
-      const contentDiv = document.createElement('div');
-      contentDiv.className = 'project-content';
+        projectCard.addEventListener('click', (e) => {
+          if ((e.target as HTMLElement).tagName !== 'A') {
+            window.open(projectUrl, '_blank', 'noopener,noreferrer');
+          }
+        });
 
-      const h3 = document.createElement('h3');
-      h3.textContent = project.title;
+        const img = document.createElement('img');
+        img.className = 'project-thumbnail';
+        img.src = project.thumbnail;
+        img.alt = project.title;
 
-      const p = document.createElement('p');
-      p.textContent = project.description;
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'project-content';
 
-      const a = document.createElement('a');
-      a.className = 'project-link';
-      a.href = `https://${encodeURIComponent(project.slug)}.bolhas.org`;
-      a.textContent = 'explorar →';
+        const h3 = document.createElement('h3');
+        h3.textContent = project.title;
 
-      contentDiv.append(h3, p, a);
-      projectCard.append(img, contentDiv);
+        const p = document.createElement('p');
+        p.textContent = project.description;
 
+        const a = document.createElement('a');
+        a.className = 'project-link';
+        a.href = projectUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = 'explorar →';
+
+        contentDiv.append(h3, p, a);
+        projectCard.append(img, contentDiv);
 
         projectsList.appendChild(projectCard);
       });
