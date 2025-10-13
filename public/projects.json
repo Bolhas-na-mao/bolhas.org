@@ -1,0 +1,8 @@
+[
+  {
+    "title": "Game Of Life",
+    "slug": "gameoflife",
+    "description": "Implementação do autómato celular inventado pelo matemático britânico John Horton Conway",
+    "thumbnail": "thumbnails/gameoflife.png"
+  }
+]
