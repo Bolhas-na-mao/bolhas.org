@@ -4,5 +4,11 @@
     "slug": "gameoflife",
     "description": "Implementação do autómato celular inventado pelo matemático britânico John Horton Conway",
     "thumbnail": "thumbnails/gameoflife.png"
+  },
+  {
+    "title": "ecosystem simulator",
+    "slug": "ecosystem",
+    "description": "Simulação de um ecossistema com predadores, presas e recursos numa cadeia alimentar interativa",
+    "thumbnail": "thumbnails/ecosystem.png"
   }
 ]
