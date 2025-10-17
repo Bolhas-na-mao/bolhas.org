@@ -60,7 +60,7 @@ export class BubbleScene {
       fragmentShader: bubbleFragmentShader,
       transparent: true,
       side: THREE.FrontSide,
-      depthWrite: true,
+      depthWrite: false,
       uniforms: {
         uTime: { value: 0 },
         uColorPink: { value: new THREE.Color(0xf1a7fe) },
