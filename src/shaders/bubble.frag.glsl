@@ -65,9 +65,12 @@ void main() {
     snoise(vPosition * 4.0 + uTime * 0.1),
     snoise(vPosition * 4.0 + 100.0 + uTime * 0.1),
     snoise(vPosition * 4.0 + 200.0 + uTime * 0.1)
-  ) * 0.15;
-  
+  ) * 0.001;
+
   vec3 normal = normalize(vNormal + normalNoise);
+
+  normal = normalize(normal + vNormal * 0.3);
+
   vec3 viewDir = normalize(vViewPosition);
   
   float fresnelPower = 3.0;

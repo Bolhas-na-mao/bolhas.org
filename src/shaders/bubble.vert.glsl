@@ -60,27 +60,41 @@ float snoise(vec3 v) {
 void main() {
   vUv = uv;
   vNormal = normalize(normalMatrix * normal);
-  
+
   vec3 pos = position;
-  
-  float noise1 = snoise(pos * 1.5 + uTime * 0.15) * 0.08;
-  float noise2 = snoise(pos * 3.0 + uTime * 0.25) * 0.04;
-  float noise3 = snoise(pos * 6.0 - uTime * 0.1) * 0.02;
-  
-  float noiseSum = (noise1 + noise2 + noise3) * uWaveIntensity;
-  
+
+  float slowNoise1 = snoise(pos * 0.8 + uTime * 0.08) * 0.001;  
+  float slowNoise2 = snoise(pos * 1.2 + uTime * 0.12) * 0.001;  
+  float mediumNoise = snoise(pos * 2.5 + uTime * 0.18) * 0.001; 
+  float fineNoise = snoise(pos * 5.0 - uTime * 0.1) * 0.005;   
+
+  float angleY = atan(position.y, position.x);
+  float angleX = asin(position.z / length(position));
+
+  float ellipsoidX = 1.0 + sin(angleY * 2.0 + uTime * 0.3) * 0.02; 
+  float ellipsoidY = 1.0 + cos(angleY * 1.5 - uTime * 0.25) * 0.015; 
+  float ellipsoidZ = 1.0 + sin(angleX * 2.5 + uTime * 0.2) * 0.02;
+
+  vec3 ellipsoidScale = vec3(ellipsoidX, ellipsoidY, ellipsoidZ);
+
+  float organicDeform = slowNoise1 + slowNoise2 + mediumNoise + fineNoise;
+
+  float radialPush = (ellipsoidScale.x + ellipsoidScale.y + ellipsoidScale.z) / 3.0 - 1.0;
+
+  float combinedDisplacement = (organicDeform + radialPush * 0.5) * uWaveIntensity;
+
   float rippleDist = distance(uv, uRippleCenter);
   float ripple = sin(rippleDist * 20.0 - uTime * 8.0) * exp(-rippleDist * 5.0) * uRippleStrength;
-  
-  pos += normal * (noiseSum + ripple * 0.15);
-  
+
+  pos += normal * (combinedDisplacement + ripple * 0.15);
+
   vec4 worldPosition = modelMatrix * vec4(pos, 1.0);
   vWorldPosition = worldPosition.xyz;
   vPosition = pos;
-  
+
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   vViewPosition = -mvPosition.xyz;
-  
+
   gl_Position = projectionMatrix * mvPosition;
 }
 
