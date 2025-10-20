@@ -88,7 +88,7 @@ export class PerformanceManager {
           level: 'low',
           pixelRatio: 1,
           particleCount: 40,
-          enablePostProcessing: false,
+          enablePostProcessing: true,
           enableRefraction: false,
           shadowsEnabled: false,
         };
