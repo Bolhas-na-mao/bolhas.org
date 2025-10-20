@@ -69,7 +69,7 @@ export class BubbleScene {
         uTime: { value: 0 },
         uColorPink: { value: new THREE.Color(0xf1a7fe) },
         uColorBlue: { value: new THREE.Color(0xc4efff) },
-        uColorExcited: { value: new THREE.Color(0xff0000) },
+        uColorExcited: { value: new THREE.Color(0xf1a7fe) },
         uCameraPosition: { value: this.camera.position },
         uWaveIntensity: { value: 0.2 },
         uIridescence: { value: 0.4 },
