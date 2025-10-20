@@ -69,7 +69,6 @@ vec3 thinFilmInterference(float cosTheta, float filmThickness) {
 }
 
 void main() {
-  // More dramatic surface variations
   vec3 normalNoise = vec3(
     snoise(vPosition * 4.0 + uTime * 0.08),
     snoise(vPosition * 4.0 + 100.0 + uTime * 0.08),
@@ -79,7 +78,7 @@ void main() {
   vec3 normal = normalize(vNormal + normalNoise);
   vec3 viewDir = normalize(vViewPosition);
   
-  float fresnelPower = 2.5;
+  float fresnelPower = 3.0;
   float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), fresnelPower);
   
   float thicknessNoise1 = snoise(vPosition * 1.5 + uTime * 0.08);
@@ -99,7 +98,7 @@ void main() {
     interference.b
   );
   
-  float colorSpread = pow(fresnel, 1.2);
+  float colorSpread = pow(fresnel, 2.5);
   vec3 surfaceColor = iridescenceColor * (0.3 + colorSpread * 1.2);
   
   float softHighlight = pow(fresnel, 4.0) * 0.15;
