@@ -92,8 +92,8 @@ void main() {
   float anisotropy = snoise(vPosition * 12.0) * 0.5 + 0.5;
   specular *= (1.0 + anisotropy * 0.6);
   
-  vec3 specularColor = mix(uColorBlue, uColorPink, fresnel) * specular * 2.5;
-  
+  vec3 specularColor = mix(uColorBlue, uColorPink, fresnel) * specular * 1.0;
+
   float thickness = 1.0 - fresnel;
   vec3 sss = mix(uColorPink, uColorBlue, thickness * 0.5) * thickness * 0.3;
   
