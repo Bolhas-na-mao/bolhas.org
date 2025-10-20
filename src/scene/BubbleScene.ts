@@ -44,7 +44,7 @@ export class BubbleScene {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
-      antialias: perfConfig.level !== 'low',
+      antialias: true,
       powerPreference: 'high-performance',
     });
 
@@ -75,7 +75,7 @@ export class BubbleScene {
       },
     });
 
-    const bubbleGeometry = new THREE.SphereGeometry(1, 360, 360);
+    const bubbleGeometry = new THREE.SphereGeometry(1, 64, 64);
     this.bubble = new THREE.Mesh(bubbleGeometry, this.bubbleMaterial);
     this.scene.add(this.bubble);
 
@@ -129,7 +129,7 @@ export class BubbleScene {
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
       0.4,
-      0.6,
+      0.1,
       0.85
     );
     this.composer.addPass(bloomPass);
@@ -145,7 +145,7 @@ export class BubbleScene {
     const chromaticAberrationShader = {
       uniforms: {
         tDiffuse: { value: null },
-        amount: { value: 0.0015 },
+        amount: { value: 0.0003 },
       },
       vertexShader: `
         varying vec2 vUv;
