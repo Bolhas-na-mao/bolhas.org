@@ -66,16 +66,16 @@ export class BubbleScene {
         uColorPink: { value: new THREE.Color(0xf1a7fe) },
         uColorBlue: { value: new THREE.Color(0xc4efff) },
         uCameraPosition: { value: this.camera.position },
-        uWaveIntensity: { value: 1.0 },
-        uIridescence: { value: 1.0 },
-        uRefractiveIndex: { value: 1.33 },
+        uWaveIntensity: { value: 0.2 },
+        uIridescence: { value: 0.5 },
+        uRefractiveIndex: { value: 1.0 },
         uRippleCenter: { value: this.rippleCenter },
         uRippleStrength: { value: 0 },
         uEnvMap: { value: this.envTexture },
       },
     });
 
-    const bubbleGeometry = new THREE.SphereGeometry(1, 128, 128);
+    const bubbleGeometry = new THREE.SphereGeometry(1, 360, 360);
     this.bubble = new THREE.Mesh(bubbleGeometry, this.bubbleMaterial);
     this.scene.add(this.bubble);
 
