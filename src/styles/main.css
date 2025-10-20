@@ -19,7 +19,7 @@ html {
 
 body {
   font-family: 'DM Mono', monospace;
-  font-weight: 400;
+  font-weight: 300;
   font-style: normal;
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -98,7 +98,7 @@ main * {
 }
 
 .projects-item h2 {
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1rem, 2vw, 1.3rem);
   margin-bottom: 1rem;
   color: var(--color-text);
 }
@@ -114,7 +114,7 @@ main * {
 }
 
 .projects h2 {
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
   margin-bottom: 3rem;
   text-align: center;
   color: var(--color-text);
@@ -180,7 +180,7 @@ main * {
 }
 
 .project-content h3 {
-  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  font-size: clamp(1rem, 2vw, 1.3rem);
   margin-bottom: 0.75rem;
   color: var(--color-text);
 }
@@ -224,7 +224,7 @@ main * {
 }
 
 .project-card h3 {
-  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  font-size: clamp(1.2rem, 2vw, 1.3rem);
   margin-bottom: 0.75rem;
   color: var(--color-text);
 }
