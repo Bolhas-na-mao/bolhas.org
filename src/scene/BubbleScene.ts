@@ -91,7 +91,7 @@ export class BubbleScene {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     this.scene.add(ambientLight);
 
-    const topLight = new THREE.DirectionalLight(0xc4efff, 0.8);
+    const topLight = new THREE.DirectionalLight(0xc4efff, 0.9);
     topLight.position.set(2, 3, 2);
     this.scene.add(topLight);
 
