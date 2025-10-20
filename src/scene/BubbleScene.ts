@@ -26,6 +26,10 @@ export class BubbleScene {
   private rippleStrength = 0;
   private performanceManager = PerformanceManager.getInstance();
   private envTexture: THREE.Texture;
+  private excitement = 0;
+
+  private lastMouse = new THREE.Vector2();
+  private mouseVelocity = new THREE.Vector2();
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -65,6 +69,7 @@ export class BubbleScene {
         uTime: { value: 0 },
         uColorPink: { value: new THREE.Color(0xf1a7fe) },
         uColorBlue: { value: new THREE.Color(0xc4efff) },
+        uColorExcited: { value: new THREE.Color(0xff0000) },
         uCameraPosition: { value: this.camera.position },
         uWaveIntensity: { value: 0.2 },
         uIridescence: { value: 0.4 },
@@ -72,6 +77,7 @@ export class BubbleScene {
         uRippleCenter: { value: this.rippleCenter },
         uRippleStrength: { value: 0 },
         uEnvMap: { value: this.envTexture },
+        uExcitement: { value: 0 },
       },
     });
 
@@ -222,22 +228,39 @@ export class BubbleScene {
   private onInteract(): void {
     this.rippleStrength = 1.0;
     this.particleSystem.disperse();
+    this.excitement = 1.0;
   }
 
   update(): void {
     const time = this.clock.getElapsedTime();
-
     this.bubbleMaterial.uniforms.uTime.value = time;
 
-    const targetRotationY = this.mouse.x * 0.3;
-    const targetRotationX = -this.mouse.y * 0.3;
-    this.bubble.rotation.y += (targetRotationY - this.bubble.rotation.y) * 0.05;
-    this.bubble.rotation.x += (targetRotationX - this.bubble.rotation.x) * 0.05;
+    this.mouseVelocity.subVectors(this.mouse, this.lastMouse);
+    const speed = this.mouseVelocity.length();
 
-    const floatY = Math.sin(time * 0.5) * 0.1;
-    const floatX = Math.cos(time * 0.3) * 0.05;
-    this.bubble.position.y = floatY;
-    this.bubble.position.x = floatX;
+    const targetExcitement = Math.min(speed * 40, 1.0);
+
+    this.excitement += (targetExcitement - this.excitement) * 0.1;
+
+    this.lastMouse.copy(this.mouse);
+
+    this.bubbleMaterial.uniforms.uExcitement.value = this.excitement;
+
+    const heartbeat = Math.sin(time * 6.0) * 0.01 + 1.0;
+    this.bubble.scale.set(heartbeat, heartbeat, heartbeat);
+
+    this.mouseWorld.set(this.mouse.x, this.mouse.y, 0.5);
+    this.mouseWorld.unproject(this.camera);
+    const direction = this.mouseWorld.sub(this.camera.position).normalize();
+    const distance = -this.camera.position.z / direction.z;
+    const pos = this.camera.position
+      .clone()
+      .add(direction.multiplyScalar(distance));
+
+    const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(
+      new THREE.Matrix4().lookAt(this.bubble.position, pos, this.bubble.up)
+    );
+    this.bubble.quaternion.slerp(targetQuaternion, 0.1);
 
     if (this.rippleStrength > 0) {
       this.rippleStrength *= 0.95;
@@ -245,9 +268,7 @@ export class BubbleScene {
     }
     this.bubbleMaterial.uniforms.uRippleStrength.value = this.rippleStrength;
 
-    this.mouseWorld.set(this.mouse.x * 2, this.mouse.y * 2, 0);
-
-    this.particleSystem.update(time, this.mouseWorld);
+    this.particleSystem.update(time, pos, this.excitement);
 
     if (this.composer) {
       this.composer.render();
