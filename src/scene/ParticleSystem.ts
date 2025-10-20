@@ -105,7 +105,7 @@ export class ParticleSystem {
       );
       const direction = new THREE.Vector3().subVectors(target, currentPos);
 
-      const distance = currentPos.length();
+      const distance = direction.length();
 
       const attractionStrength = Math.max(
         0,
