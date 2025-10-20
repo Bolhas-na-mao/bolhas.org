@@ -1,10 +1,12 @@
 uniform vec3 uColorPink;
 uniform vec3 uColorBlue;
+uniform vec3 uColorExcited;
 uniform float uTime;
 uniform vec3 uCameraPosition;
 uniform float uIridescence;
 uniform float uRefractiveIndex;
 uniform sampler2D uEnvMap;
+uniform float uExcitement;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
@@ -17,7 +19,7 @@ vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
 vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 
-float snoise(vec3 v) { 
+float snoise(vec3 v) {
   const vec2 C = vec2(1.0/6.0, 1.0/3.0);
   const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
   vec3 i  = floor(v + dot(v, C.yyy));
@@ -29,7 +31,7 @@ float snoise(vec3 v) {
   vec3 x1 = x0 - i1 + C.xxx;
   vec3 x2 = x0 - i2 + C.yyy;
   vec3 x3 = x0 - D.yyy;
-  i = mod289(i); 
+  i = mod289(i);
   vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
   float n_ = 0.142857142857;
   vec3 ns = n_ * D.wyz - D.xzx;
@@ -78,7 +80,7 @@ void main() {
   vec3 normal = normalize(vNormal + normalNoise);
   vec3 viewDir = normalize(vViewPosition);
   
-  float fresnelPower = 3.0;
+  float fresnelPower = 4.0;
   float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), fresnelPower);
   
   float thicknessNoise1 = snoise(vPosition * 1.5 + uTime * 0.08);
@@ -92,16 +94,18 @@ void main() {
   float cosTheta = abs(dot(viewDir, normal));
   vec3 interference = thinFilmInterference(cosTheta, filmThickness);
   
-  vec3 iridescenceColor = mix(
+  vec3 baseIridescenceColor = mix(
     mix(uColorBlue, uColorPink, interference.r),
     mix(uColorPink, uColorBlue, interference.g),
     interference.b
   );
   
-  float colorSpread = pow(fresnel, 2.5);
+  vec3 iridescenceColor = mix(baseIridescenceColor, uColorExcited, uExcitement);
+  
+  float colorSpread = pow(fresnel, 1.2);
   vec3 surfaceColor = iridescenceColor * (0.3 + colorSpread * 1.2);
   
-  float softHighlight = pow(fresnel, 4.0) * 0.15;
+  float softHighlight = pow(fresnel, 4.0) * (0.15 + uExcitement * 0.4);
   vec3 highlightColor = vec3(1.0) * softHighlight;
   
   vec3 reflectDir = reflect(-viewDir, normal);
