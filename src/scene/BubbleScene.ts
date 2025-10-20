@@ -88,14 +88,14 @@ export class BubbleScene {
     this.particleSystem = new ParticleSystem(perfConfig.particleCount, 1);
     this.scene.add(this.particleSystem.getMesh());
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     this.scene.add(ambientLight);
 
-    const topLight = new THREE.DirectionalLight(0xc4efff, 0.9);
+    const topLight = new THREE.DirectionalLight(0xc4efff, 2.0);
     topLight.position.set(2, 3, 2);
     this.scene.add(topLight);
 
-    const sideLight = new THREE.DirectionalLight(0xf1a7fe, 0.6);
+    const sideLight = new THREE.DirectionalLight(0xf1a7fe, 1.0);
     sideLight.position.set(-2, 1, -1);
     this.scene.add(sideLight);
 
