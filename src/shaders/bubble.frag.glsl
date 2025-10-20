@@ -60,54 +60,70 @@ float snoise(vec3 v) {
   return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
 }
 
-void main() {
-  vec3 normalNoise = vec3(
-    snoise(vPosition * 4.0 + uTime * 0.1),
-    snoise(vPosition * 4.0 + 100.0 + uTime * 0.1),
-    snoise(vPosition * 4.0 + 200.0 + uTime * 0.1)
-  ) * 0.001;
-
-  vec3 normal = normalize(vNormal + normalNoise);
-
-  normal = normalize(normal + vNormal * 0.3);
-
-  vec3 viewDir = normalize(vViewPosition);
-  
-  float fresnelPower = 3.0;
-  float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), fresnelPower);
-  
-  float iridescence = snoise(vPosition * 8.0 + uTime * 0.05) * 0.5 + 0.5;
-  vec3 iridescenceColor = mix(uColorBlue, uColorPink, iridescence * uIridescence);
-  
-  vec3 baseColor = mix(
-    vec3(1.0, 1.0, 1.0) * 0.1,
-    iridescenceColor,
-    fresnel * 0.8
-  );
-  
-  vec3 H = normalize(viewDir + vec3(0.0, 1.0, 0.0));
-  float specAngle = max(dot(H, normal), 0.0);
-  float specular = pow(specAngle, 120.0);
-  
-  float anisotropy = snoise(vPosition * 12.0) * 0.5 + 0.5;
-  specular *= (1.0 + anisotropy * 0.6);
-  
-  vec3 specularColor = mix(uColorBlue, uColorPink, fresnel) * specular * 1.0;
-
-  float thickness = 1.0 - fresnel;
-  vec3 sss = mix(uColorPink, uColorBlue, thickness * 0.5) * thickness * 0.3;
-  
-  vec3 refractDir = refract(-viewDir, normal, 1.0 / uRefractiveIndex);
-  vec2 refractUV = vUv + refractDir.xy * 0.05;
-  vec3 refractColor = texture2D(uEnvMap, refractUV).rgb * 0.15;
-  
-  vec3 finalColor = baseColor + specularColor + sss + refractColor;
-  
-  finalColor = pow(finalColor, vec3(0.9));
-  
-  float edgeGlow = pow(fresnel, 1.5) * 0.4;
-  finalColor += iridescenceColor * edgeGlow;
-  
-  gl_FragColor = vec4(finalColor, 0.85 + fresnel * 0.15);
+vec3 thinFilmInterference(float cosTheta, float filmThickness) {
+  vec3 wavelengths = vec3(650.0, 510.0, 475.0); 
+  float opticalPath = 2.0 * filmThickness * sqrt(1.0 - pow(cosTheta, 2.0));
+  vec3 phase = (opticalPath / wavelengths) * 6.283185;
+  vec3 interference = cos(phase) * 0.5 + 0.5;
+  return interference;
 }
 
+void main() {
+  // More dramatic surface variations
+  vec3 normalNoise = vec3(
+    snoise(vPosition * 4.0 + uTime * 0.08),
+    snoise(vPosition * 4.0 + 100.0 + uTime * 0.08),
+    snoise(vPosition * 4.0 + 200.0 + uTime * 0.08)
+  ) * 0.05;
+
+  vec3 normal = normalize(vNormal + normalNoise);
+  vec3 viewDir = normalize(vViewPosition);
+  
+  float fresnelPower = 2.5;
+  float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), fresnelPower);
+  
+  float thicknessNoise1 = snoise(vPosition * 1.5 + uTime * 0.08);
+  float thicknessNoise2 = snoise(vPosition * 3.5 + uTime * 0.15);
+  float thicknessNoise3 = snoise(vPosition * 7.0 - uTime * 0.05);
+  
+  float thicknessVariation = (thicknessNoise1 * 0.5 + thicknessNoise2 * 0.3 + thicknessNoise3 * 0.2) * 0.5 + 0.5;
+  
+  float filmThickness = 250.0 + thicknessVariation * 600.0;
+  
+  float cosTheta = abs(dot(viewDir, normal));
+  vec3 interference = thinFilmInterference(cosTheta, filmThickness);
+  
+  vec3 iridescenceColor = mix(
+    mix(uColorBlue, uColorPink, interference.r),
+    mix(uColorPink, uColorBlue, interference.g),
+    interference.b
+  );
+  
+  float colorSpread = pow(fresnel, 1.2);
+  vec3 surfaceColor = iridescenceColor * (0.3 + colorSpread * 1.2);
+  
+  float softHighlight = pow(fresnel, 4.0) * 0.15;
+  vec3 highlightColor = vec3(1.0) * softHighlight;
+  
+  vec3 reflectDir = reflect(-viewDir, normal);
+  vec2 envUV = vec2(
+    atan(reflectDir.x, reflectDir.z) / 6.283185 + 0.5,
+    asin(reflectDir.y) / 3.141593 + 0.5
+  );
+  vec3 envReflection = texture2D(uEnvMap, envUV).rgb * fresnel * 0.3;
+  
+  vec3 refractDir = refract(-viewDir, normal, 1.0 / 1.33); 
+  vec2 refractUV = vec2(
+    atan(refractDir.x, refractDir.z) / 6.283185 + 0.5,
+    asin(refractDir.y) / 3.141593 + 0.5
+  );
+  vec3 envRefraction = texture2D(uEnvMap, refractUV).rgb * (1.0 - fresnel) * 0.25;
+
+  vec3 finalColor = surfaceColor + highlightColor + envReflection + envRefraction;
+  
+  finalColor = pow(finalColor, vec3(0.55));
+  
+  float alpha = 0.35 + fresnel * 0.55;
+  
+  gl_FragColor = vec4(finalColor, alpha);
+}
