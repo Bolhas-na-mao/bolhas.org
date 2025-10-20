@@ -13,6 +13,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'DM Mono', monospace;
   font-weight: 300;
@@ -49,15 +53,36 @@ main * {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between;
   text-align: center;
-  padding: 4rem 0;
+  padding-top: 4rem;
 }
 
 .hero h1 {
-  font-size: clamp(3rem, 8vw, 6rem);
+  font-size: clamp(1rem, 2vw, 1.3rem);
   color: var(--color-foreground);
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.arrow-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.arrow-link:hover {
+  transform: translateY(8px);
+}
+
+.arrow-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4rem;
 }
 
 .projects {
@@ -73,7 +98,7 @@ main * {
 }
 
 .projects-item h2 {
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1rem, 2vw, 1.3rem);
   margin-bottom: 1rem;
   color: var(--color-text);
 }
@@ -86,10 +111,11 @@ main * {
 
 .projects {
   padding: 6rem 0;
+  min-height: 100vh;
 }
 
 .projects h2 {
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
   margin-bottom: 3rem;
   text-align: center;
   color: var(--color-text);
@@ -155,7 +181,7 @@ main * {
 }
 
 .project-content h3 {
-  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  font-size: clamp(1rem, 2vw, 1.3rem);
   margin-bottom: 0.75rem;
   color: var(--color-text);
 }
@@ -174,18 +200,18 @@ main * {
   }
   25% {
     text-shadow:
-      -2px 0 0 rgba(255, 0, 0, 0.5),
-      2px 0 0 rgba(0, 255, 255, 0.5);
+      -2px 0 0 #f1a7fe,
+      2px 0 0 #c4efff;
   }
   50% {
     text-shadow:
-      -3px 0 0 rgba(255, 0, 0, 0.7),
-      3px 0 0 rgba(0, 255, 255, 0.7);
+      -3px 0 0 #f1a7feba,
+      3px 0 0 #c4efffa6;
   }
   75% {
     text-shadow:
-      -2px 0 0 rgba(255, 0, 0, 0.5),
-      2px 0 0 rgba(0, 255, 255, 0.5);
+      -2px 0 0 #f1a7fe51,
+      2px 0 0 #c4efff5e;
   }
 }
 
@@ -199,7 +225,7 @@ main * {
 }
 
 .project-card h3 {
-  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  font-size: clamp(1.2rem, 2vw, 1.3rem);
   margin-bottom: 0.75rem;
   color: var(--color-text);
 }

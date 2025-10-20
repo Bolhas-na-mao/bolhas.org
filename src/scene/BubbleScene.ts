@@ -26,6 +26,10 @@ export class BubbleScene {
   private rippleStrength = 0;
   private performanceManager = PerformanceManager.getInstance();
   private envTexture: THREE.Texture;
+  private excitement = 0;
+
+  private lastMouse = new THREE.Vector2();
+  private mouseVelocity = new THREE.Vector2();
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -44,7 +48,7 @@ export class BubbleScene {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
-      antialias: perfConfig.level !== 'low',
+      antialias: true,
       powerPreference: 'high-performance',
     });
 
@@ -65,31 +69,33 @@ export class BubbleScene {
         uTime: { value: 0 },
         uColorPink: { value: new THREE.Color(0xf1a7fe) },
         uColorBlue: { value: new THREE.Color(0xc4efff) },
+        uColorExcited: { value: new THREE.Color(0xf1a7fe) },
         uCameraPosition: { value: this.camera.position },
-        uWaveIntensity: { value: 1.0 },
-        uIridescence: { value: 1.0 },
-        uRefractiveIndex: { value: 1.33 },
+        uWaveIntensity: { value: 0.2 },
+        uIridescence: { value: 0.4 },
+        uRefractiveIndex: { value: 0.4 },
         uRippleCenter: { value: this.rippleCenter },
         uRippleStrength: { value: 0 },
         uEnvMap: { value: this.envTexture },
+        uExcitement: { value: 0 },
       },
     });
 
-    const bubbleGeometry = new THREE.SphereGeometry(1, 128, 128);
+    const bubbleGeometry = new THREE.SphereGeometry(1, 64, 64);
     this.bubble = new THREE.Mesh(bubbleGeometry, this.bubbleMaterial);
     this.scene.add(this.bubble);
 
     this.particleSystem = new ParticleSystem(perfConfig.particleCount, 1);
     this.scene.add(this.particleSystem.getMesh());
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     this.scene.add(ambientLight);
 
-    const topLight = new THREE.DirectionalLight(0xc4efff, 0.8);
+    const topLight = new THREE.DirectionalLight(0xc4efff, 2.0);
     topLight.position.set(2, 3, 2);
     this.scene.add(topLight);
 
-    const sideLight = new THREE.DirectionalLight(0xf1a7fe, 0.6);
+    const sideLight = new THREE.DirectionalLight(0xf1a7fe, 1.0);
     sideLight.position.set(-2, 1, -1);
     this.scene.add(sideLight);
 
@@ -129,7 +135,7 @@ export class BubbleScene {
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
       0.4,
-      0.6,
+      0.1,
       0.85
     );
     this.composer.addPass(bloomPass);
@@ -141,36 +147,6 @@ export class BubbleScene {
     fxaaPass.material.uniforms['resolution'].value.y =
       1 / (window.innerHeight * pixelRatio);
     this.composer.addPass(fxaaPass);
-
-    const chromaticAberrationShader = {
-      uniforms: {
-        tDiffuse: { value: null },
-        amount: { value: 0.0015 },
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform sampler2D tDiffuse;
-        uniform float amount;
-        varying vec2 vUv;
-        
-        void main() {
-          vec2 offset = vec2(amount, 0.0);
-          vec4 cr = texture2D(tDiffuse, vUv + offset);
-          vec4 cga = texture2D(tDiffuse, vUv);
-          vec4 cb = texture2D(tDiffuse, vUv - offset);
-          gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);
-        }
-      `,
-    };
-
-    const chromaticPass = new ShaderPass(chromaticAberrationShader);
-    this.composer.addPass(chromaticPass);
   }
 
   private setupEventListeners(): void {
@@ -252,22 +228,39 @@ export class BubbleScene {
   private onInteract(): void {
     this.rippleStrength = 1.0;
     this.particleSystem.disperse();
+    this.excitement = 1.0;
   }
 
   update(): void {
     const time = this.clock.getElapsedTime();
-
     this.bubbleMaterial.uniforms.uTime.value = time;
 
-    const targetRotationY = this.mouse.x * 0.3;
-    const targetRotationX = -this.mouse.y * 0.3;
-    this.bubble.rotation.y += (targetRotationY - this.bubble.rotation.y) * 0.05;
-    this.bubble.rotation.x += (targetRotationX - this.bubble.rotation.x) * 0.05;
+    this.mouseVelocity.subVectors(this.mouse, this.lastMouse);
+    const speed = this.mouseVelocity.length();
 
-    const floatY = Math.sin(time * 0.5) * 0.1;
-    const floatX = Math.cos(time * 0.3) * 0.05;
-    this.bubble.position.y = floatY;
-    this.bubble.position.x = floatX;
+    const targetExcitement = Math.min(speed * 40, 1.0);
+
+    this.excitement += (targetExcitement - this.excitement) * 0.1;
+
+    this.lastMouse.copy(this.mouse);
+
+    this.bubbleMaterial.uniforms.uExcitement.value = this.excitement;
+
+    const heartbeat = Math.sin(time * 6.0) * 0.01 + 1.0;
+    this.bubble.scale.set(heartbeat, heartbeat, heartbeat);
+
+    this.mouseWorld.set(this.mouse.x, this.mouse.y, 0.5);
+    this.mouseWorld.unproject(this.camera);
+    const direction = this.mouseWorld.sub(this.camera.position).normalize();
+    const distance = -this.camera.position.z / direction.z;
+    const pos = this.camera.position
+      .clone()
+      .add(direction.multiplyScalar(distance));
+
+    const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(
+      new THREE.Matrix4().lookAt(this.bubble.position, pos, this.bubble.up)
+    );
+    this.bubble.quaternion.slerp(targetQuaternion, 0.1);
 
     if (this.rippleStrength > 0) {
       this.rippleStrength *= 0.95;
@@ -275,9 +268,7 @@ export class BubbleScene {
     }
     this.bubbleMaterial.uniforms.uRippleStrength.value = this.rippleStrength;
 
-    this.mouseWorld.set(this.mouse.x * 2, this.mouse.y * 2, 0);
-
-    this.particleSystem.update(time, this.mouseWorld);
+    this.particleSystem.update(time, pos, this.excitement);
 
     if (this.composer) {
       this.composer.render();
