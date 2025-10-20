@@ -136,4 +136,12 @@ export class ParticleSystem {
 
     this.geometry.attributes.position.needsUpdate = true;
   }
+
+  public dispose(): void {
+    (this.geometry.attributes.position as THREE.BufferAttribute).array =
+      new Float32Array(0);
+    this.geometry.dispose();
+    if (this.material.map) this.material.map.dispose();
+    this.material.dispose();
+  }
 }
