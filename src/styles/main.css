@@ -13,9 +13,13 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'DM Mono', monospace;
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -49,15 +53,36 @@ main * {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between;
   text-align: center;
-  padding: 4rem 0;
+  padding-top: 4rem;
 }
 
 .hero h1 {
-  font-size: clamp(3rem, 8vw, 6rem);
+  font-size: clamp(1rem, 4vw, 3rem);
   color: var(--color-foreground);
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.arrow-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.arrow-link:hover {
+  transform: translateY(8px);
+}
+
+.arrow-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4rem;
 }
 
 .projects {
