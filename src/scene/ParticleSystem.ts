@@ -32,7 +32,7 @@ export class ParticleSystem {
     );
 
     const textureLoader = new THREE.TextureLoader();
-    const particleTexture = textureLoader.load('circle_05.png');
+    const particleTexture = textureLoader.load('particle.png');
 
     this.material = new THREE.PointsMaterial({
       size: 0.05,
