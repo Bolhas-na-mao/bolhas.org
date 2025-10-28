@@ -1,4 +1,4 @@
-# 🌐 Bolhas na Mão — Landing Page
+# 🌐 Bolhas na Mão
 
 > Línguas: **Português (BR)** | [English](README.en.md)
 
