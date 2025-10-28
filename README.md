@@ -1,7 +1,3 @@
-Perfeito. Mantendo o mesmo estilo — direto, didático e sem enrolação — aqui está o **README para o repositório `bolhas.org`**, que representa apenas a landing page do projeto, não o projeto Bolhas em si:
-
----
-
 # 🌐 Bolhas na Mão — Landing Page
 
 > Línguas: **Português (BR)** | [English](README.en.md)
