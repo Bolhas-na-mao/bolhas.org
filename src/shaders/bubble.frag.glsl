@@ -133,56 +133,61 @@ void main() {
 =======
 void main() {
   vec3 normalNoise = vec3(
-    snoise(vPosition * 4.0 + uTime * 0.1),
-    snoise(vPosition * 4.0 + 100.0 + uTime * 0.1),
-    snoise(vPosition * 4.0 + 200.0 + uTime * 0.1)
-  ) * 0.001;
+    snoise(vPosition * 8.0 + uTime * 0.05),
+    snoise(vPosition * 8.0 + 100.0 + uTime * 0.05),
+    snoise(vPosition * 8.0 + 200.0 + uTime * 0.05)
+  ) * 0.001; 
 
   vec3 normal = normalize(vNormal + normalNoise);
-  normal = normalize(normal + vNormal * 0.3);
-
   vec3 viewDir = normalize(vViewPosition);
 
   float fresnelPower = 3.0;
   float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), fresnelPower);
-
+  
   float thicknessNoise = snoise(vPosition * 3.0 + uTime * 0.2);
   float gravityFactor = (vPosition.y * 0.5 + 0.5);
   float thickness = mix(0.1, 1.0, gravityFactor) + thicknessNoise * 0.1;
 
-  float viewAngle = dot(viewDir, normal);
-  vec3 iridescenceColor = sin(vec3(0.9, 0.8, 0.7) * thickness * 20.0 + viewAngle * 2.0);
-  iridescenceColor = pow(abs(iridescenceColor), vec3(1.5));
-
+  float viewAngle = 1.0 - abs(dot(viewDir, normal));
+  float interferencePhase = thickness * 4.0 * 3.14159 + viewAngle * 3.14159;
+  
+  vec3 thinFilmColor = vec3(
+    sin(interferencePhase * 1.0) * 0.5 + 0.5,
+    sin(interferencePhase * 1.3 + 2.094) * 0.5 + 0.5,
+    sin(interferencePhase * 1.6 + 4.189) * 0.5 + 0.5
+  );
+  
+  float desaturation = 0.4;
+  float luminance = dot(thinFilmColor, vec3(0.299, 0.587, 0.114));
+  thinFilmColor = mix(vec3(luminance), thinFilmColor, desaturation);
+  
   vec3 baseColor = mix(
-    vec3(1.0, 1.0, 1.0) * 0.1,
-    iridescenceColor,
-    fresnel * 0.8
+    vec3(0.95, 0.95, 0.98), 
+    thinFilmColor * 0.3, 
+    fresnel * 0.6
   );
 
-  vec3 H = normalize(viewDir + vec3(0.0, 1.0, 0.0));
+  vec3 H = normalize(viewDir + normalize(vec3(0.3, 1.0, 0.2)));
   float specAngle = max(dot(H, normal), 0.0);
-  float specular = pow(specAngle, 120.0);
+  float specular = pow(specAngle, 256.0) * 0.8;
+  
+  vec3 specularColor = vec3(1.0, 1.0, 1.0) * specular;
 
-  float anisotropy = snoise(vPosition * 12.0) * 0.5 + 0.5;
-  specular *= (1.0 + anisotropy * 0.6);
+  vec3 reflectDir = reflect(-viewDir, normal);
+  vec2 envUV = vec2(
+    atan(reflectDir.x, reflectDir.z) / (2.0 * 3.14159) + 0.5,
+    asin(reflectDir.y) / 3.14159 + 0.5
+  );
+  vec3 envColor = texture2D(uEnvMap, envUV).rgb * 0.1 * fresnel;
 
-  vec3 specularColor = mix(uColorBlue, uColorPink, fresnel) * specular * 2.5;
-
-  float sssThickness = 1.0 - fresnel;
-  vec3 sss = mix(uColorPink, uColorBlue, sssThickness * 0.5) * sssThickness * 0.01;
-
-  vec3 refractDir = refract(-viewDir, normal, 1.0 / uRefractiveIndex);
-  vec2 refractUV = vUv + refractDir.xy * 0.05;
-  vec3 refractColor = texture2D(uEnvMap, refractUV).rgb * 0.15;
-
-  vec3 finalColor = baseColor + specularColor + sss + refractColor;
-
-  finalColor = pow(finalColor, vec3(0.9));
-
-  float edgeGlow = pow(fresnel, 1.5) * 0.4;
-  finalColor += iridescenceColor * edgeGlow;
-
+  vec3 finalColor = baseColor * 0.1 + 
+                    thinFilmColor * fresnel * 0.15 + 
+                    specularColor * 0.3 +
+                    envColor;
+  
+  float edgeGlow = pow(fresnel, 3.0) * 0.1;
+  finalColor += vec3(1.0, 1.0, 1.0) * edgeGlow;
+  
   gl_FragColor = vec4(finalColor, 0.85 + fresnel * 0.15);
 >>>>>>> 208a828 (fix: adjust incorrect indentation on the dispose method)
 }

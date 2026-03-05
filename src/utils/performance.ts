@@ -12,9 +12,12 @@ export interface PerformanceConfig {
 export class PerformanceManager {
   private static instance: PerformanceManager;
   private config: PerformanceConfig;
+  private webgl2Supported: boolean;
 
   private constructor() {
-    this.config = this.detectQuality();
+    const canvas = document.createElement('canvas');
+    this.webgl2Supported = !!canvas.getContext('webgl2');
+    this.config = this.detectQuality(canvas);
   }
 
   static getInstance(): PerformanceManager {
@@ -24,7 +27,7 @@ export class PerformanceManager {
     return PerformanceManager.instance;
   }
 
-  private detectQuality(): PerformanceConfig {
+  private detectQuality(canvas: HTMLCanvasElement): PerformanceConfig {
     const urlParams = new URLSearchParams(window.location.search);
     const forcedPerf = urlParams.get('perf') as QualityLevel | null;
 
@@ -38,7 +41,6 @@ export class PerformanceManager {
       );
     const isTablet = /iPad|Android/i.test(navigator.userAgent) && !isMobile;
 
-    const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
 
     if (!gl) {
@@ -100,8 +102,7 @@ export class PerformanceManager {
   }
 
   supportsWebGL2(): boolean {
-    const canvas = document.createElement('canvas');
-    return !!canvas.getContext('webgl2');
+    return this.webgl2Supported;
   }
 
   supportsFloatTextures(): boolean {
