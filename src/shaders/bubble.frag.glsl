@@ -62,6 +62,7 @@ float snoise(vec3 v) {
   return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
 }
 
+<<<<<<< HEAD
 vec3 thinFilmInterference(float cosTheta, float filmThickness) {
   vec3 wavelengths = vec3(650.0, 510.0, 475.0); 
   float opticalPath = 2.0 * filmThickness * sqrt(1.0 - pow(cosTheta, 2.0));
@@ -129,4 +130,59 @@ void main() {
   float alpha = 0.35 + fresnel * 0.55;
   
   gl_FragColor = vec4(finalColor, alpha);
+=======
+void main() {
+  vec3 normalNoise = vec3(
+    snoise(vPosition * 4.0 + uTime * 0.1),
+    snoise(vPosition * 4.0 + 100.0 + uTime * 0.1),
+    snoise(vPosition * 4.0 + 200.0 + uTime * 0.1)
+  ) * 0.001;
+
+  vec3 normal = normalize(vNormal + normalNoise);
+  normal = normalize(normal + vNormal * 0.3);
+
+  vec3 viewDir = normalize(vViewPosition);
+
+  float fresnelPower = 3.0;
+  float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), fresnelPower);
+
+  float thicknessNoise = snoise(vPosition * 3.0 + uTime * 0.2);
+  float gravityFactor = (vPosition.y * 0.5 + 0.5);
+  float thickness = mix(0.1, 1.0, gravityFactor) + thicknessNoise * 0.1;
+
+  float viewAngle = dot(viewDir, normal);
+  vec3 iridescenceColor = sin(vec3(0.9, 0.8, 0.7) * thickness * 20.0 + viewAngle * 2.0);
+  iridescenceColor = pow(abs(iridescenceColor), vec3(1.5));
+
+  vec3 baseColor = mix(
+    vec3(1.0, 1.0, 1.0) * 0.1,
+    iridescenceColor,
+    fresnel * 0.8
+  );
+
+  vec3 H = normalize(viewDir + vec3(0.0, 1.0, 0.0));
+  float specAngle = max(dot(H, normal), 0.0);
+  float specular = pow(specAngle, 120.0);
+
+  float anisotropy = snoise(vPosition * 12.0) * 0.5 + 0.5;
+  specular *= (1.0 + anisotropy * 0.6);
+
+  vec3 specularColor = mix(uColorBlue, uColorPink, fresnel) * specular * 2.5;
+
+  float sssThickness = 1.0 - fresnel;
+  vec3 sss = mix(uColorPink, uColorBlue, sssThickness * 0.5) * sssThickness * 0.01;
+
+  vec3 refractDir = refract(-viewDir, normal, 1.0 / uRefractiveIndex);
+  vec2 refractUV = vUv + refractDir.xy * 0.05;
+  vec3 refractColor = texture2D(uEnvMap, refractUV).rgb * 0.15;
+
+  vec3 finalColor = baseColor + specularColor + sss + refractColor;
+
+  finalColor = pow(finalColor, vec3(0.9));
+
+  float edgeGlow = pow(fresnel, 1.5) * 0.4;
+  finalColor += iridescenceColor * edgeGlow;
+
+  gl_FragColor = vec4(finalColor, 0.85 + fresnel * 0.15);
+>>>>>>> 208a828 (fix: adjust incorrect indentation on the dispose method)
 }
