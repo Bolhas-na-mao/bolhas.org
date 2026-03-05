@@ -31,6 +31,27 @@ export class BubbleScene {
   private lastMouse = new THREE.Vector2();
   private mouseVelocity = new THREE.Vector2();
 
+  private handlers = {
+    resize: () => this.onResize(),
+    mousemove: (e: MouseEvent) => this.onMouseMove(e),
+    touchmove: (e: TouchEvent) => this.onTouchMove(e),
+    interact: () => this.onInteract(),
+    keydown: (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.onInteract();
+      } else if (e.key === 'ArrowLeft') {
+        this.bubble.rotation.y += 0.1;
+      } else if (e.key === 'ArrowRight') {
+        this.bubble.rotation.y -= 0.1;
+      } else if (e.key === 'ArrowUp') {
+        this.bubble.rotation.x += 0.1;
+      } else if (e.key === 'ArrowDown') {
+        this.bubble.rotation.x -= 0.1;
+      }
+    },
+  };
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.scene = new THREE.Scene();
@@ -150,26 +171,12 @@ export class BubbleScene {
   }
 
   private setupEventListeners(): void {
-    window.addEventListener('resize', () => this.onResize());
-    window.addEventListener('mousemove', (e) => this.onMouseMove(e));
-    window.addEventListener('touchmove', (e) => this.onTouchMove(e));
-    this.canvas.addEventListener('click', () => this.onInteract());
-    this.canvas.addEventListener('touchstart', () => this.onInteract());
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        this.onInteract();
-      } else if (e.key === 'ArrowLeft') {
-        this.bubble.rotation.y += 0.1;
-      } else if (e.key === 'ArrowRight') {
-        this.bubble.rotation.y -= 0.1;
-      } else if (e.key === 'ArrowUp') {
-        this.bubble.rotation.x += 0.1;
-      } else if (e.key === 'ArrowDown') {
-        this.bubble.rotation.x -= 0.1;
-      }
-    });
+    window.addEventListener('resize', this.handlers.resize);
+    window.addEventListener('mousemove', this.handlers.mousemove);
+    window.addEventListener('touchmove', this.handlers.touchmove);
+    this.canvas.addEventListener('click', this.handlers.interact);
+    this.canvas.addEventListener('touchstart', this.handlers.interact);
+    window.addEventListener('keydown', this.handlers.keydown);
   }
 
   private onResize(): void {
@@ -278,6 +285,13 @@ export class BubbleScene {
   }
 
   dispose(): void {
+    window.removeEventListener('resize', this.handlers.resize);
+    window.removeEventListener('mousemove', this.handlers.mousemove);
+    window.removeEventListener('touchmove', this.handlers.touchmove);
+    this.canvas.removeEventListener('click', this.handlers.interact);
+    this.canvas.removeEventListener('touchstart', this.handlers.interact);
+    window.removeEventListener('keydown', this.handlers.keydown);
+
     this.renderer.dispose();
     this.bubbleMaterial.dispose();
     this.envTexture.dispose();

@@ -89,7 +89,7 @@ void main() {
   float ripple = sin(rippleDist * 20.0 - uTime * 8.0) * exp(-rippleDist * 5.0) * uRippleStrength;
   
   pos += normal * (combinedDisplacement + ripple * 0.15);
-  
+
   vec4 worldPosition = modelMatrix * vec4(pos, 1.0);
   vWorldPosition = worldPosition.xyz;
   vPosition = pos;
